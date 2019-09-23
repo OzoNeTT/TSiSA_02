@@ -52,6 +52,15 @@ void RandomSearch(double a, double b) {
                     best_x = current_x_storage[k];
                 }
             }
+            
+            //for multimodal
+            //for(int k = 0; k < current_x_storage.size(); k++) {
+            //    if (fabs(multiModalFunction(current_x_storage[k])) > best_y) {
+            //        best_y = fabs(myFunction(current_x_storage[k]));
+            //        best_x = current_x_storage[k];
+            //    }
+            //}
+
             X_storage[i][j] = best_x;
             current_x_storage.clear();
         }
@@ -60,6 +69,7 @@ void RandomSearch(double a, double b) {
     for(int i = 0; i < q.size(); i++) {
         for (int j = 0; j < propabilities.size(); j++) {
             std::cout << X_storage[i][j] << "   ";
+            //for multimodal     std::cout << multiModalFunction(X_storage[i][j]) << "   ";
         }
         std::cout << "\n";
     }
