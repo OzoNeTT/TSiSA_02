@@ -2,7 +2,6 @@
 #include <vector>
 #include <cmath>
 #include <string>
-#include <random>
 #include <iomanip>
 
 double myFunction(double x) {
@@ -12,29 +11,52 @@ double myFunction(double x) {
 double multiModalFunction(double x){
     return myFunction(x)*sin(5 * x);
 }
-void PrintN(double (&N_storage)[20][10], int q_size, int p_size){
-    for(int raws = 0; raws < q_size; raws++) {
-        for (int columnes = 0; columnes < p_size; columnes++) {
-            std::cout << N_storage[raws][columnes] << "\t|\t";
+
+void PrintN(double (&N_storage)[20][10], std::vector<double> q, std::vector<double> p){
+    std::cout << "\t\tN parametrs:\n";
+    std::cout << "\tq\\p\t|\t";
+    for (int i = 0; i < p.size(); i++) {
+        std::cout << std::fixed << std::setprecision(2) << p[i] << "\t|\t";
+    }
+    std::cout << std::endl;
+    for(int raws = 0; raws < q.size(); raws++) {
+        std::cout << std::fixed << std::setprecision(3) << q[raws] << "\t|\t";
+        for (int columns = 0; columns < p.size(); columns++) {
+            std::cout << N_storage[raws][columns] << "\t|\t";
         }
         std::cout << "\n";
     }
     std::cout << "\n\n";
 }
 
-void PrintResultUnimodal(double (&X_storage)[20][10], int q_size, int p_size) {
-    for(int raws = 0; raws < q_size; raws++) {
-        for (int columnes = 0; columnes < p_size; columnes++) {
-            std::cout << X_storage[raws][columnes] << "\t|\t";
+void PrintResultUnimodal(double (&X_storage)[20][10], std::vector<double> q, std::vector<double> p) {
+    std::cout << "\t\tUnimodal x parametrs:\n";
+    std::cout << "\tq\\p\t|\t";
+    for (int i = 0; i < p.size(); i++) {
+        std::cout << std::fixed << std::setprecision(6) << p[i] << "\t|\t";
+    }
+    std::cout << std::endl;
+    for(int raws = 0; raws < q.size(); raws++) {
+        std::cout << std::fixed << std::setprecision(3) << q[raws] << "\t|\t";
+        for (int columns = 0; columns < p.size(); columns++) {
+            std::cout << std::fixed << std::setprecision(6) <<
+            myFunction(X_storage[raws][columns]) << "\t|\t";
         }
         std::cout << "\n";
     }
     std::cout << "\n\n";
 }
 
-void PrintResultMultimodal(double (&X_storage)[20][10], int q_size, int p_size) {
-    for(int raws = 0; raws < q_size; raws++) {
-        for (int columnes = 0; columnes < p_size; columnes++) {
+void PrintResultMultimodal(double (&X_storage)[20][10], std::vector<double> q, std::vector<double> p) {
+    std::cout << "\t\tMultimodal y parametrs:\n";
+    std::cout << "\tq\\p\t|\t";
+    for (int i = 0; i < p.size(); i++) {
+        std::cout << std::fixed << std::setprecision(6) << p[i] << "\t|\t";
+    }
+    std::cout << std::endl;
+    for(int raws = 0; raws < q.size(); raws++) {
+        std::cout << std::fixed << std::setprecision(3) << q[raws] << "\t|\t";
+        for (int columnes = 0; columnes < p.size(); columnes++) {
             std::cout << std::fixed << std::setprecision(6)
                       << multiModalFunction(X_storage[raws][columnes]) << "\t|\t";
         }
@@ -52,12 +74,12 @@ void RandomSearch(double begin, double end, std::string function) {
     double X_storage[20][10];
     std::vector<double> current_x_storage;
 
-    for (int i = 0; i < 10; i++) {
+    for (int column = 0; column < 10; column++) {
         propabilities.push_back(propability);
         propability += 0.01;
     }
 
-    for(int k = 0; k < 20; k++) {
+    for(int raw = 0; raw < 20; raw++) {
         q.push_back(firs_q);
         firs_q += 0.005;
     }
@@ -74,18 +96,18 @@ void RandomSearch(double begin, double end, std::string function) {
             }
 
             if(function == "unimodal") {
-                for (int index = 0; index < current_x_storage.size(); index++) {
-                    if (myFunction(current_x_storage[index]) < best_y) {
-                        best_y = myFunction(current_x_storage[index]);
-                        best_x = current_x_storage[index];
+                for (auto index : current_x_storage) {
+                    if (myFunction(index) < best_y) {
+                        best_y = myFunction(index);
+                        best_x = index;
                     }
                 }
             }
             else if(function == "multimodal") {
-                for(int index = 0; index < current_x_storage.size(); index++) {
-                    if (fabs(multiModalFunction(current_x_storage[index])) > best_y) {
-                        best_y = fabs(myFunction(current_x_storage[index]));
-                        best_x = current_x_storage[index];
+                for(auto index : current_x_storage) {
+                    if (fabs(multiModalFunction(index)) > best_y) {
+                        best_y = fabs(myFunction(index));
+                        best_x = index;
                     }
                 }
             }
@@ -94,12 +116,13 @@ void RandomSearch(double begin, double end, std::string function) {
             current_x_storage.clear();
         }
     }
+
     if(function == "unimodal") {
-        PrintN(N_storage, q.size(), propabilities.size());
-        PrintResultUnimodal(X_storage, q.size(), propabilities.size());
+        PrintN(N_storage, q, propabilities);
+        PrintResultUnimodal(X_storage, q, propabilities);
     }
     else if(function == "multimodal")
-        PrintResultMultimodal(X_storage, q.size(), propabilities.size());
+        PrintResultMultimodal(X_storage, q, propabilities);
     std::cout << std::endl;
 
 
